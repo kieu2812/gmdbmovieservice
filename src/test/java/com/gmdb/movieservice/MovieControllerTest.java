@@ -3,7 +3,6 @@ package com.gmdb.movieservice;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmdb.movieservice.bean.Movie;
-import com.gmdb.movieservice.bean.MovieRating;
 import com.gmdb.movieservice.bean.User;
 import com.gmdb.movieservice.dao.MovieRepository;
 import com.gmdb.movieservice.dao.UserRepository;
@@ -42,29 +41,31 @@ public class MovieControllerTest {
     MovieRepository movieRepository;
 
     @Autowired
-     UserRepository userRepository;
+    UserRepository userRepository;
 
 
-    public String getJSON(String path) throws  Exception{
+    public String getJSON(String path) throws Exception {
         Path paths = Paths.get(path);
         return new String(Files.readAllBytes(paths));
     }
 
     private void createMockData() throws Exception {
-        String movieStr =getJSON("src/test/resources/oneMovie.json");
+        String movieStr = getJSON("src/test/resources/oneMovie.json");
         Movie movie = mapper.readValue(movieStr, Movie.class);
         this.movieRepository.save(movie);
 
     }
 
     private void createMockManyMovies() throws Exception {
-        String movieStr =getJSON("src/test/resources/manyMovies.json");
-        TypeReference<List<Movie>> movies = new TypeReference<List<Movie>>() {};
+        String movieStr = getJSON("src/test/resources/manyMovies.json");
+        TypeReference<List<Movie>> movies = new TypeReference<List<Movie>>() {
+        };
 
         List<Movie> jsonToMovieList = mapper.readValue(movieStr, movies);
         this.movieRepository.saveAll(jsonToMovieList);
 
     }
+
     @Test
     public void testGetEmptyMovies() throws Exception {
         this.mvc.perform(get("/movies"))
@@ -96,7 +97,6 @@ public class MovieControllerTest {
     }
 
 
-
     @Test
     @Transactional
     @Rollback
@@ -119,7 +119,7 @@ public class MovieControllerTest {
     public void testGetManyMovies() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
         Movie movie2 = moviesList.get(1);
 
@@ -143,10 +143,10 @@ public class MovieControllerTest {
     public void testGetExistingMovieDetails() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
 
-        RequestBuilder request  = get("/movies/title")
+        RequestBuilder request = get("/movies/title")
                 .param("title", movie.getTitle());
 
         this.mvc.perform(request)
@@ -166,9 +166,9 @@ public class MovieControllerTest {
     public void testGetNonExistingMovieDetails() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
 
-        RequestBuilder request  = get("/movies/title")
+        RequestBuilder request = get("/movies/title")
                 .param("title", "SUPERMAN");
 
         this.mvc.perform(request)
@@ -185,17 +185,17 @@ public class MovieControllerTest {
     public void testSubmitRatingToMovie() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
 
-        User user =  new User("nicky");
+        User user = new User("nicky");
         this.userRepository.save(user);
 
         String movieRatingStr = getJSON("src/test/resources/userRating.json");
 
         MovieRatingRequest movieRating = mapper.readValue(movieRatingStr, MovieRatingRequest.class);
 
-        RequestBuilder request  = post("/movies/userRating")
+        RequestBuilder request = post("/movies/userRating")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(movieRatingStr);
 
@@ -208,7 +208,7 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.data.actors", is(movie.getActors())))
                 .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
                 .andExpect(jsonPath("$.data.description", is(movie.getDescription())))
-                .andExpect(jsonPath("$.data.rating",is((double)movieRating.getRating())));
+                .andExpect(jsonPath("$.data.rating", is((double) movieRating.getRating())));
 
     }
 
@@ -218,11 +218,11 @@ public class MovieControllerTest {
     public void testManyMovieRatings() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
 
-        User user1 =  new User("nicky");
-        User user2 =  new User("mike");
+        User user1 = new User("nicky");
+        User user2 = new User("mike");
         this.userRepository.save(user1);
         this.userRepository.save(user2);
         String movieRatingStr1 = getJSON("src/test/resources/userRating.json");
@@ -230,12 +230,11 @@ public class MovieControllerTest {
         String movieRatingStr2 = getJSON("src/test/resources/mikeUserRating.json");
 
 
-
-        RequestBuilder request1  = post("/movies/userRating")
+        RequestBuilder request1 = post("/movies/userRating")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(movieRatingStr1);
 
-        RequestBuilder request2  = post("/movies/userRating")
+        RequestBuilder request2 = post("/movies/userRating")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(movieRatingStr2);
 
@@ -251,7 +250,7 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.data.actors", is(movie.getActors())))
                 .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
                 .andExpect(jsonPath("$.data.description", is(movie.getDescription())))
-                .andExpect(jsonPath("$.data.rating",is(4.0)));
+                .andExpect(jsonPath("$.data.rating", is(4.0)));
     }
 
     @Test
@@ -260,11 +259,11 @@ public class MovieControllerTest {
     public void testGetMovieDetailsWithManyMovieRatings() throws Exception {
 
         createMockManyMovies();
-        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
 
-        User user1 =  new User("nicky");
-        User user2 =  new User("mike");
+        User user1 = new User("nicky");
+        User user2 = new User("mike");
         this.userRepository.save(user1);
         this.userRepository.save(user2);
         String movieRatingStr1 = getJSON("src/test/resources/userRating.json");
@@ -274,11 +273,11 @@ public class MovieControllerTest {
         MovieRatingRequest movieRating2 = mapper.readValue(movieRatingStr2, MovieRatingRequest.class);
 
 
-        RequestBuilder request1  = post("/movies/userRating")
+        RequestBuilder request1 = post("/movies/userRating")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(movieRatingStr1);
 
-        RequestBuilder request2  = post("/movies/userRating")
+        RequestBuilder request2 = post("/movies/userRating")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(movieRatingStr2);
 
@@ -311,6 +310,34 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.data.movieRatings.[0].rating", is(movieRating1.getRating())))
                 .andExpect(jsonPath("$.data.movieRatings.[1].rating", is(movieRating2.getRating())));
 
+
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testSubmitReviewWithoutRating() throws Exception {
+
+        createMockManyMovies();
+        List<Movie> moviesList = (List<Movie>) this.movieRepository.findAll();
+        Movie movie = moviesList.get(0);
+
+        User user1 = new User("Taylor");
+        this.userRepository.save(user1);
+        String movieRatingStr = getJSON("src/test/resources/userReviewWithoutRating.json");
+        MovieRatingRequest movieRating1 = mapper.readValue(movieRatingStr, MovieRatingRequest.class);
+
+
+        RequestBuilder request = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr);
+
+
+        this.mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())))
+                .andExpect(jsonPath("$.message", is(Constants.RATING_REQUIRE)))
+                .andExpect(jsonPath("$.data", is(nullValue())));
 
     }
 
