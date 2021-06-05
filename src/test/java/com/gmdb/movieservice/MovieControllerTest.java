@@ -3,7 +3,11 @@ package com.gmdb.movieservice;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmdb.movieservice.bean.Movie;
+import com.gmdb.movieservice.bean.MovieRating;
+import com.gmdb.movieservice.bean.User;
 import com.gmdb.movieservice.dao.MovieRepository;
+import com.gmdb.movieservice.dao.UserRepository;
+import com.gmdb.movieservice.request.MovieRatingRequest;
 import com.gmdb.movieservice.util.Constants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,10 @@ public class MovieControllerTest {
     ObjectMapper mapper = new ObjectMapper();
     @Autowired
     MovieRepository movieRepository;
+
+    @Autowired
+     UserRepository userRepository;
+
 
     public String getJSON(String path) throws  Exception{
         Path paths = Paths.get(path);
@@ -113,7 +121,6 @@ public class MovieControllerTest {
         createMockManyMovies();
         List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
         Movie movie = moviesList.get(0);
-
         Movie movie2 = moviesList.get(1);
 
         this.mvc.perform(get("/movies"))
@@ -152,6 +159,7 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
                 .andExpect(jsonPath("$.data.description", is(movie.getDescription())));
     }
+
     @Test
     @Transactional
     @Rollback
@@ -168,6 +176,39 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.status", is(HttpStatus.NOT_FOUND.value())))
                 .andExpect(jsonPath("$.message", is(Constants.NOT_FOUND)))
                 .andExpect(jsonPath("$.data", is(nullValue())));
+
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testSubmitRatingToMovie() throws Exception {
+
+        createMockManyMovies();
+        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        Movie movie = moviesList.get(0);
+
+        User user =  new User("nicky");
+        this.userRepository.save(user);
+
+        String movieRatingStr = getJSON("src/test/resources/userRating.json");
+
+        MovieRatingRequest movieRating = mapper.readValue(movieRatingStr, MovieRatingRequest.class);
+
+        RequestBuilder request  = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr);
+
+        this.mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value())))
+                .andExpect(jsonPath("$.message", is(Constants.CREATED)))
+                .andExpect(jsonPath("$.data.title", is(movie.getTitle())))
+                .andExpect(jsonPath("$.data.director", is(movie.getDirector())))
+                .andExpect(jsonPath("$.data.actors", is(movie.getActors())))
+                .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
+                .andExpect(jsonPath("$.data.description", is(movie.getDescription())))
+                .andExpect(jsonPath("$.data.rating",is((double)movieRating.getRating())));
 
     }
 

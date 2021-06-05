@@ -1,4 +1,4 @@
-package com.gmdb.movieservice.response;
+package com.gmdb.movieservice.request;
 
 import com.gmdb.movieservice.bean.Movie;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieDetailResponse {
-    private int status;
-    private String message;
-    private Movie data;
+public class MovieRatingRequest {
+    private String movieTitle;
+    private String userName;
+    private int rating;
+    private String reviews;
+
 }

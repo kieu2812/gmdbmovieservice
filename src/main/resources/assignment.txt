@@ -63,6 +63,7 @@ Then I should see that movie's details
 Given the GMDB has many movies
 When I visit GMDB movies with a non-existing title
 Then I receive a friendly message that it doesn't exist
+
 As a user, I can give a star rating to a movie so that I can share my experiences with others.
 
 Given an existing movie
