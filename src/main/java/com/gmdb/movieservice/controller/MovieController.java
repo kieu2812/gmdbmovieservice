@@ -2,6 +2,7 @@ package com.gmdb.movieservice.controller;
 
 import com.gmdb.movieservice.bean.Movie;
 import com.gmdb.movieservice.bean.MovieRating;
+import com.gmdb.movieservice.bean.MovieRatingReview;
 import com.gmdb.movieservice.bean.User;
 import com.gmdb.movieservice.dao.MovieRatingRepository;
 import com.gmdb.movieservice.dao.MovieRepository;
@@ -12,7 +13,8 @@ import com.gmdb.movieservice.util.Constants;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -56,13 +58,20 @@ public class MovieController {
         if(movie.isPresent()) {
 
             MovieRating movieRating = new MovieRating();
-            movieRating.setMovieId(movie.get().getId());
-            movieRating.setUserId(this.userRepository.findByName(movieRatingRequest.getUserName()).getId());
+            movieRating.setMovieId(movie.get().getMovieId());
+            User user  =  this.userRepository.findByName(movieRatingRequest.getUserName());
+            movieRating.setUserId(user.getId());
             movieRating.setRating(movieRatingRequest.getRating());
-
+            movieRating.setUserName(user.getName());
+            movieRating.setReview(movieRatingRequest.getReviews());
             this.movieRatingRepository.save(movieRating);
-            double averageRating  =  movieRating.getRating();
+            double averageRating  = this.movieRatingRepository.calculateAvgRating(movieRating.getMovieId());
             movie.get().setRating(averageRating);
+
+            List<MovieRating> movieRatings =  movie.get().getMovieRatings()==null ? new ArrayList<>() : movie.get().getMovieRatings();
+            movieRatings.add(movieRating);
+            movie.get().setMovieRatings(movieRatings);
+
             this.movieRepository.save(movie.get());
             return new MovieDetailResponse(HttpStatus.CREATED.value(), Constants.CREATED, movie.get());
         }

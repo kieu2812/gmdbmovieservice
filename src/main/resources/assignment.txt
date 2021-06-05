@@ -73,6 +73,7 @@ Then I can see it in the movie details.
 Given a movie with one 5 star rating and one 3 star rating
 When I view the movie details
 Then I expect the star rating to be 4.
+
 As a user, I can review a movie so that I can share my thoughts about it.
 
 Given an existing movie

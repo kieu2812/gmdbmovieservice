@@ -212,6 +212,107 @@ public class MovieControllerTest {
 
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void testManyMovieRatings() throws Exception {
+
+        createMockManyMovies();
+        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        Movie movie = moviesList.get(0);
+
+        User user1 =  new User("nicky");
+        User user2 =  new User("mike");
+        this.userRepository.save(user1);
+        this.userRepository.save(user2);
+        String movieRatingStr1 = getJSON("src/test/resources/userRating.json");
+
+        String movieRatingStr2 = getJSON("src/test/resources/mikeUserRating.json");
+
+
+
+        RequestBuilder request1  = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr1);
+
+        RequestBuilder request2  = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr2);
+
+        this.mvc.perform(request1)
+                .andExpect(status().isOk());
+
+        this.mvc.perform(request2)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value())))
+                .andExpect(jsonPath("$.message", is(Constants.CREATED)))
+                .andExpect(jsonPath("$.data.title", is(movie.getTitle())))
+                .andExpect(jsonPath("$.data.director", is(movie.getDirector())))
+                .andExpect(jsonPath("$.data.actors", is(movie.getActors())))
+                .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
+                .andExpect(jsonPath("$.data.description", is(movie.getDescription())))
+                .andExpect(jsonPath("$.data.rating",is(4.0)));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testGetMovieDetailsWithManyMovieRatings() throws Exception {
+
+        createMockManyMovies();
+        List<Movie> moviesList =(List<Movie>) this.movieRepository.findAll();
+        Movie movie = moviesList.get(0);
+
+        User user1 =  new User("nicky");
+        User user2 =  new User("mike");
+        this.userRepository.save(user1);
+        this.userRepository.save(user2);
+        String movieRatingStr1 = getJSON("src/test/resources/userRating.json");
+        MovieRatingRequest movieRating1 = mapper.readValue(movieRatingStr1, MovieRatingRequest.class);
+
+        String movieRatingStr2 = getJSON("src/test/resources/mikeUserRating.json");
+        MovieRatingRequest movieRating2 = mapper.readValue(movieRatingStr2, MovieRatingRequest.class);
+
+
+        RequestBuilder request1  = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr1);
+
+        RequestBuilder request2  = post("/movies/userRating")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(movieRatingStr2);
+
+        RequestBuilder request3 = get("/movies/title")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("title", movie.getTitle());
+
+        this.mvc.perform(request1)
+                .andExpect(status().isOk());
+
+        this.mvc.perform(request2)
+                .andExpect(status().isOk());
+
+        movie = moviesList.get(0);
+
+        this.mvc.perform(request3)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.FOUND.value())))
+                .andExpect(jsonPath("$.message", is(Constants.SUCCESS)))
+                .andExpect(jsonPath("$.data.title", is(movie.getTitle())))
+                .andExpect(jsonPath("$.data.director", is(movie.getDirector())))
+                .andExpect(jsonPath("$.data.actors", is(movie.getActors())))
+                .andExpect(jsonPath("$.data.release", is(movie.getRelease())))
+                .andExpect(jsonPath("$.data.description", is(movie.getDescription())))
+                .andExpect(jsonPath("$.data.rating", is(4.0)))
+                .andExpect(jsonPath("$.data.movieRatings.[0].review", is(movieRating1.getReviews())))
+                .andExpect(jsonPath("$.data.movieRatings.[1].review", is(movieRating2.getReviews())))
+                .andExpect(jsonPath("$.data.movieRatings.[0].userName", is(user1.getName())))
+                .andExpect(jsonPath("$.data.movieRatings.[1].userName", is(user2.getName())))
+                .andExpect(jsonPath("$.data.movieRatings.[0].rating", is(movieRating1.getRating())))
+                .andExpect(jsonPath("$.data.movieRatings.[1].rating", is(movieRating2.getRating())));
+
+
+    }
 
 
 }
