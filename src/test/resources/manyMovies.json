@@ -1,0 +1,58 @@
+[
+  {
+    "title": "The Avengers",
+    "director": "Joss Whedon",
+    "actors": "Robert Downey Jr., Chris Evans, Mark Ruffalo, Chris Hemsworth",
+    "release": "2012",
+    "description": "Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.",
+    "rating": null
+  },
+  {
+    "title": "Superman Returns",
+    "director": "Bryan Singer",
+    "actors": "Brandon Routh, Kate Bosworth, Kevin Spacey, James Marsden",
+    "release": "2006",
+    "description": "Superman returns to Earth after spending five years in space examining his homeworld Krypton. But he finds things have changed while he was gone, and he must once again prove himself important to the world.",
+    "rating": null
+  },
+  {
+    "title": "Steel",
+    "director": "Kenneth Johnson",
+    "actors": "Shaquille O'Neal, Annabeth Gish, Judd Nelson, Richard Roundtree",
+    "release": "1997",
+    "description": "A scientist for the military turns himself into a cartoon-like superhero when a version of one of his own weapons is being used against enemies.",
+    "rating": null
+  },
+  {
+    "title": "Unbreakable",
+    "director": "M. Night Shyamalan",
+    "actors": "Bruce Willis, Samuel L. Jackson, Robin Wright, Spencer Treat Clark",
+    "release": "2000",
+    "description": "A man learns something extraordinary about himself after a devastating accident.",
+    "rating": null
+  },
+  {
+    "title": "Rocketeer",
+    "director": "Jay Light",
+    "actors": "Christopher Coakley",
+    "release": "2012",
+    "description": "N/A",
+    "rating": null
+  },
+  {
+    "title": "The Incredibles",
+    "director": "Brad Bird",
+    "actors": "Craig T. Nelson, Holly Hunter, Samuel L. Jackson, Jason Lee",
+    "release": "2004",
+    "description": "A family of undercover superheroes, while trying to live the quiet suburban life, are forced into action to save the world.",
+    "rating": null
+  },
+  {
+    "title": "The Lego Batman Movie",
+    "director": "Chris McKay",
+    "actors": "Will Arnett, Michael Cera, Rosario Dawson, Ralph Fiennes",
+    "release": "2017",
+    "description": "A cooler-than-ever Bruce Wayne must deal with the usual suspects as they plan to rule Gotham City, while discovering that he has accidentally adopted a teenage orphan who wishes to become his sidekick.",
+    "rating": null
+  }
+]
